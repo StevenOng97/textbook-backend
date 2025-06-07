@@ -89,7 +89,7 @@ router.get('/:magicLinkId', async (req: Request, res: Response) => {
       source: 'magic_link'
     });
 
-    const redirectUrl = `${frontendUrl}?${urlParams.toString()}`;
+    const redirectUrl = `${frontendUrl}`;
     
     console.log(`🚀 Redirecting to: ${redirectUrl}`);
     
