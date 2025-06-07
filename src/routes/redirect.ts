@@ -94,14 +94,14 @@ router.get('/:magicLinkId', async (req: Request, res: Response) => {
     console.log(`🚀 Redirecting to: ${redirectUrl}`);
     
     // Perform the redirect
-    res.redirect(302, redirectUrl);
+    return res.redirect(302, redirectUrl);
 
   } catch (error) {
     console.error('Magic link redirect error:', error);
     
     // Redirect to error page
     const errorUrl = `${process.env.FRONTEND_BASE_URL || 'https://usetextbook.com'}/booking/error?reason=server_error`;
-    res.redirect(errorUrl);
+    return res.redirect(errorUrl);
   }
 });
 
@@ -144,7 +144,7 @@ router.get('/:magicLinkId/preview', validateNanoId, async (req: Request, res: Re
     });
     const redirectUrl = `${frontendUrl}?${urlParams.toString()}`;
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: {
         uuid: booking.id,
@@ -161,7 +161,7 @@ router.get('/:magicLinkId/preview', validateNanoId, async (req: Request, res: Re
 
   } catch (error) {
     console.error('Magic link preview error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Internal server error',
       message: 'An unexpected error occurred while previewing the magic link.'
@@ -213,14 +213,14 @@ router.post('/:magicLinkId/track', validateNanoId, async (req: Request<{ magicLi
       }
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: 'Event tracked successfully.'
     });
 
   } catch (error) {
     console.error('Tracking error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Internal server error',
       message: 'An unexpected error occurred while tracking the event.'
@@ -263,7 +263,7 @@ router.get('/:magicLinkId/analytics', validateNanoId, async (req: Request, res: 
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: {
         bookingId: booking.bookingId,
@@ -280,7 +280,7 @@ router.get('/:magicLinkId/analytics', validateNanoId, async (req: Request, res: 
 
   } catch (error) {
     console.error('Analytics retrieval error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Internal server error',
       message: 'An unexpected error occurred while retrieving analytics data.'

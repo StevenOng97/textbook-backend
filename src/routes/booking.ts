@@ -52,7 +52,7 @@ router.post('/create', validateBookingRequest, async (req: Request<{}, CreateBoo
     // via SMS, email, or your preferred notification service
     console.log(`📱 Send confirmation to ${userPhone}: Your appointment is booked! Confirm here: ${magicLink}`);
     
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: {
         bookingId: booking.bookingId,
@@ -66,7 +66,7 @@ router.post('/create', validateBookingRequest, async (req: Request<{}, CreateBoo
 
   } catch (error) {
     console.error('Booking creation error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Internal server error',
       message: 'An unexpected error occurred while creating the booking.'
@@ -99,7 +99,7 @@ router.post('/confirm/:uuid', async (req: Request, res: Response) => {
       }
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: {
         bookingId: booking.bookingId,
@@ -120,7 +120,7 @@ router.post('/confirm/:uuid', async (req: Request, res: Response) => {
       });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Internal server error',
       message: 'An unexpected error occurred while confirming the booking.'
@@ -157,7 +157,7 @@ router.put('/payment/:uuid', validatePaymentStatusUpdate, async (req: Request<{ 
       }
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: {
         bookingId: booking.bookingId,
@@ -178,7 +178,7 @@ router.put('/payment/:uuid', validatePaymentStatusUpdate, async (req: Request<{ 
       });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Internal server error',
       message: 'An unexpected error occurred while updating payment status.'
@@ -214,7 +214,7 @@ router.get('/:uuid', async (req: Request, res: Response<BookingResponse>) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: {
         bookingId: booking.bookingId,
@@ -234,7 +234,7 @@ router.get('/:uuid', async (req: Request, res: Response<BookingResponse>) => {
 
   } catch (error) {
     console.error('Booking retrieval error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Internal server error',
       message: 'An unexpected error occurred while retrieving the booking.'
@@ -246,7 +246,7 @@ router.get('/:uuid', async (req: Request, res: Response<BookingResponse>) => {
  * GET /api/booking/magic/:magicLinkId
  * Retrieve booking details by magic link ID (nanoid)
  */
-router.get('/magic/:magicLinkId', async (req: Request, res: Response<BookingResponse>) => {
+router.get('/magic/:magicLinkId', async (req: Request, res: Response) => {
   try {
     const { magicLinkId } = req.params;
 
@@ -279,7 +279,7 @@ router.get('/magic/:magicLinkId', async (req: Request, res: Response<BookingResp
       }
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: {
         bookingId: booking.bookingId,
@@ -299,7 +299,7 @@ router.get('/magic/:magicLinkId', async (req: Request, res: Response<BookingResp
 
   } catch (error) {
     console.error('Booking retrieval by magic link error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Internal server error',
       message: 'An unexpected error occurred while retrieving the booking.'
