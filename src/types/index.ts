@@ -102,7 +102,7 @@ export interface BookingResponse {
   success: boolean;
   data?: {
     bookingId: string;
-    uuid: string;
+    id: string;
     userName: string;
     userPhone: string;
     appointmentType: AppointmentType;

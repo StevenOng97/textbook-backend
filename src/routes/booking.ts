@@ -190,11 +190,11 @@ router.put('/payment/:uuid', validatePaymentStatusUpdate, async (req: Request<{ 
  * GET /api/booking/:uuid
  * Retrieve booking details by UUID
  */
-router.get('/:uuid', async (req: Request, res: Response<BookingResponse>) => {
+router.get('/:id', async (req: Request, res: Response<BookingResponse>) => {
   try {
-    const { uuid } = req.params;
+    const { id } = req.params;
 
-    if (!uuid) {
+    if (!id) {
       return res.status(400).json({
         success: false,
         error: 'Missing UUID',
@@ -203,7 +203,7 @@ router.get('/:uuid', async (req: Request, res: Response<BookingResponse>) => {
     }
 
     const booking = await prisma.booking.findUnique({
-      where: { id: uuid }
+      where: { id }
     });
 
     if (!booking) {
@@ -218,7 +218,7 @@ router.get('/:uuid', async (req: Request, res: Response<BookingResponse>) => {
       success: true,
       data: {
         bookingId: booking.bookingId,
-        uuid: booking.id,
+        id: booking.id,
         userName: booking.userName,
         userPhone: booking.userPhone,
         appointmentType: booking.appointmentType as AppointmentType,

@@ -80,7 +80,7 @@ router.get('/:magicLinkId', async (req: Request, res: Response) => {
 
     // Redirect to frontend with bookingId
     // Format: https://usetextbook.com/booking/{bookingId}
-    const frontendUrl = `${process.env.FRONTEND_BASE_URL || 'https://usetextbook.com'}/booking/${booking.bookingId}`;
+    const frontendUrl = `${process.env.FRONTEND_BASE_URL || 'https://usetextbook.com'}/booking/${booking.id}`;
     
     // Add query parameters for additional context
     const urlParams = new URLSearchParams({
