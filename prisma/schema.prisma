@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Booking {
+  // Primary identifier (UUID)
+  id String @id @default(uuid()) @db.Uuid
+
+  // Human-readable booking ID for frontend
+  bookingId String @unique @map("booking_id") @db.VarChar(255)
+
+  // Magic link short ID using nanoid
+  magicLinkId String @unique @map("magic_link_id") @db.VarChar(50)
+
+  // User information
+  userName  String @map("user_name") @db.VarChar(255)
+  userPhone String @map("user_phone") @db.VarChar(50)
+
+  // Appointment details
+  appointmentType AppointmentType @map("appointment_type")
+  appointmentDate DateTime        @map("appointment_date") @db.Timestamptz(6)
+  bookingDetails  Json            @default("{}") @map("booking_details") @db.JsonB
+
+  // Status tracking
+  status        BookingStatus @default(PENDING_CONFIRMATION)
+  paymentStatus PaymentStatus @default(PENDING) @map("payment_status")
+
+  // Payment information
+  paymentId       String?  @map("payment_id") @db.VarChar(255)
+  paymentAmount   Decimal? @map("payment_amount") @db.Decimal(10, 2)
+  paymentCurrency String?  @map("payment_currency") @db.VarChar(3)
+
+  // Timestamps
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  confirmedAt      DateTime? @map("confirmed_at") @db.Timestamptz(6)
+  paymentUpdatedAt DateTime? @map("payment_updated_at") @db.Timestamptz(6)
+  lastAccessedAt   DateTime? @map("last_accessed_at") @db.Timestamptz(6)
+
+  // Analytics
+  accessCount Int @default(0) @map("access_count")
+
+  // Relations
+  analytics BookingAnalytics[]
+
+  @@map("bookings")
+  @@index([bookingId])
+  @@index([magicLinkId])
+  @@index([userPhone])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([appointmentDate])
+  @@index([createdAt])
+}
+
+model BookingAnalytics {
+  id String @id @default(uuid()) @db.Uuid
+
+  // Foreign key to booking
+  bookingId String  @map("booking_id") @db.Uuid
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  // Event details
+  eventType String @map("event_type") @db.VarChar(100)
+  userAgent String? @map("user_agent") @db.Text
+  ipAddress String? @map("ip_address") @db.Inet
+
+  // Timestamp
+  timestamp DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("booking_analytics")
+  @@index([bookingId])
+  @@index([eventType])
+  @@index([timestamp])
+}
+
+enum AppointmentType {
+  CONSULTATION
+  TUTORIAL
+  ASSESSMENT
+  GROUP_SESSION
+  WORKSHOP
+
+  @@map("appointment_type")
+}
+
+enum BookingStatus {
+  PENDING_CONFIRMATION
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+
+  @@map("booking_status")
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
+
+  @@map("payment_status")
+} 
