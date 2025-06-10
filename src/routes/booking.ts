@@ -1,6 +1,7 @@
 import express, { Request, Response, Router } from 'express';
 import { nanoid } from 'nanoid';
 import prisma from '../config/database';
+import { calculateMagicLinkExpiration } from '../utils/magicLink';
 import { 
   validateBookingRequest, 
   validatePaymentStatusUpdate 
@@ -30,6 +31,9 @@ router.post('/create', validateBookingRequest, async (req: Request<{}, CreateBoo
     const bookingId = `booking_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const magicLinkId = nanoid(12); // Generate 12-character nanoid for magic link
     
+    // Set magic link expiration to 1 hour from now
+    const magicLinkExpiresAt = calculateMagicLinkExpiration();
+    
     // Create booking record in database using Prisma
     const booking = await prisma.booking.create({
       data: {
@@ -42,6 +46,7 @@ router.post('/create', validateBookingRequest, async (req: Request<{}, CreateBoo
         bookingDetails: bookingDetails || {},
         status: BookingStatus.PENDING_CONFIRMATION,
         paymentStatus: PaymentStatus.PENDING,
+        magicLinkExpiresAt,
       }
     });
 
@@ -267,6 +272,15 @@ router.get('/magic/:magicLinkId', async (req: Request, res: Response) => {
         success: false,
         error: 'Booking not found',
         message: 'Unable to find booking with the provided magic link ID.'
+      });
+    }
+
+    // Check if magic link has expired
+    if (booking.magicLinkExpiresAt && new Date() > booking.magicLinkExpiresAt) {
+      return res.status(410).json({
+        success: false,
+        error: 'Magic link expired',
+        message: 'This magic link has expired and is no longer valid.'
       });
     }
 

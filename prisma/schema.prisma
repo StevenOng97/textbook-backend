@@ -44,6 +44,7 @@ model Booking {
   confirmedAt      DateTime? @map("confirmed_at") @db.Timestamptz(6)
   paymentUpdatedAt DateTime? @map("payment_updated_at") @db.Timestamptz(6)
   lastAccessedAt   DateTime? @map("last_accessed_at") @db.Timestamptz(6)
+  magicLinkExpiresAt DateTime? @map("magic_link_expires_at") @db.Timestamptz(6)
 
   // Analytics
   accessCount Int @default(0) @map("access_count")
@@ -59,6 +60,7 @@ model Booking {
   @@index([paymentStatus])
   @@index([appointmentDate])
   @@index([createdAt])
+  @@index([magicLinkExpiresAt])
 }
 
 model BookingAnalytics {

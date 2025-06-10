@@ -1,5 +1,6 @@
 import { PrismaClient, AppointmentType, BookingStatus, PaymentStatus } from '@prisma/client';
 import { nanoid } from 'nanoid';
+import { calculateMagicLinkExpiration } from '../src/utils/magicLink';
 
 const prisma = new PrismaClient();
 
@@ -28,7 +29,8 @@ async function main() {
       paymentCurrency: 'USD',
       confirmedAt: new Date(),
       paymentUpdatedAt: new Date(),
-      accessCount: 3
+      accessCount: 3,
+      magicLinkExpiresAt: calculateMagicLinkExpiration()
     },
     {
       bookingId: `booking_${Date.now()}_sample2`,
@@ -45,7 +47,8 @@ async function main() {
       },
       status: BookingStatus.PENDING_CONFIRMATION,
       paymentStatus: PaymentStatus.PENDING,
-      accessCount: 1
+      accessCount: 1,
+      magicLinkExpiresAt: calculateMagicLinkExpiration()
     },
     {
       bookingId: `booking_${Date.now()}_sample3`,
@@ -65,7 +68,8 @@ async function main() {
       paymentId: 'payment_failed_456',
       confirmedAt: new Date(),
       paymentUpdatedAt: new Date(),
-      accessCount: 0
+      accessCount: 0,
+      magicLinkExpiresAt: calculateMagicLinkExpiration()
     }
   ];
 

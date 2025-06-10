@@ -40,7 +40,8 @@ router.get('/:magicLinkId', async (req: Request, res: Response) => {
         status: true,
         paymentStatus: true,
         userName: true,
-        accessCount: true
+        accessCount: true,
+        magicLinkExpiresAt: true
       }
     });
 
@@ -49,6 +50,29 @@ router.get('/:magicLinkId', async (req: Request, res: Response) => {
       
       // Redirect to error page
       const errorUrl = `${process.env.FRONTEND_BASE_URL || 'https://usetextbook.com'}/booking/error?reason=not_found`;
+      return res.redirect(errorUrl);
+    }
+
+    // Check if magic link has expired
+    if (booking.magicLinkExpiresAt && new Date() > booking.magicLinkExpiresAt) {
+      console.error('Magic link expired for booking:', booking.bookingId);
+      
+      // Track expired link access
+      try {
+        await prisma.bookingAnalytics.create({
+          data: {
+            bookingId: booking.id,
+            eventType: 'magic_link_expired_access',
+            userAgent: req.get('User-Agent') || null,
+            ipAddress: req.ip || null
+          }
+        });
+      } catch (analyticsError) {
+        console.warn('Failed to track expired link analytics:', analyticsError);
+      }
+      
+      // Redirect to error page with expired reason
+      const errorUrl = `${process.env.FRONTEND_BASE_URL || 'https://usetextbook.com'}/booking/error?reason=expired`;
       return res.redirect(errorUrl);
     }
 
@@ -132,6 +156,15 @@ router.get('/:magicLinkId/preview', validateNanoId, async (req: Request, res: Re
         success: false,
         error: 'Booking not found',
         message: 'Unable to find booking with the provided magic link ID.'
+      });
+    }
+
+    // Check if magic link has expired
+    if (booking.magicLinkExpiresAt && new Date() > booking.magicLinkExpiresAt) {
+      return res.status(410).json({
+        success: false,
+        error: 'Magic link expired',
+        message: 'This magic link has expired and is no longer valid.'
       });
     }
 
