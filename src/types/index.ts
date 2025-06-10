@@ -113,6 +113,7 @@ export interface BookingResponse {
     confirmedAt?: string;
     bookingDetails: Record<string, any>;
     magicLinkId: string;
+    isExpired?: boolean;
   };
   error?: string;
   message?: string;

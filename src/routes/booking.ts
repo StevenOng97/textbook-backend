@@ -233,7 +233,8 @@ router.get('/:id', async (req: Request, res: Response<BookingResponse>) => {
         createdAt: booking.createdAt.toISOString(),
         confirmedAt: booking.confirmedAt?.toISOString(),
         bookingDetails: booking.bookingDetails as Record<string, any>,
-        magicLinkId: booking.magicLinkId
+        magicLinkId: booking.magicLinkId,
+        isExpired: booking.magicLinkExpiresAt && new Date() > booking.magicLinkExpiresAt || false
       }
     });
 
